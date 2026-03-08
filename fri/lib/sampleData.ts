@@ -1,0 +1,133 @@
+import { Conversation, ClassifiedConversation, AnalysisResult, FailureCategory } from './types'
+
+export const sampleConversations: Conversation[] = [
+  { id: 'conv_001', customerMessage: "My subscription renewed but I wanted to cancel it before the renewal date. Can I get a refund?", finResponse: "Our cancellation policy allows cancellations before the renewal date. For refund requests, please contact our billing team directly. Is there anything else I can help with?", resolved: true, reopened: true, followUpWithin7Days: true },
+  { id: 'conv_002', customerMessage: "How do I connect your API to my Salesforce instance using OAuth 2.0? I keep getting a 401 error on the token exchange step.", finResponse: "I'm sorry, I don't have specific information about Salesforce OAuth integration. I recommend checking our developer documentation or contacting our technical support team.", resolved: false, csatScore: 2, followUpWithin7Days: true },
+  { id: 'conv_003', customerMessage: "What's your GDPR data retention policy for EU customers? We're doing a compliance audit and need the exact retention periods for each data category.", finResponse: "For EU customers, we retain personal data for the duration of the contract plus 30 days for account data, 12 months for usage logs, and 7 years for billing records as required by law.", resolved: true, csatScore: 5 },
+  { id: 'conv_004', customerMessage: "Can you process a partial refund of £45 for the unused portion of my annual plan? I downgraded last week.", finResponse: "I understand you'd like a partial refund. Unfortunately, I'm not able to process refunds directly, but I can escalate this to our billing team.", resolved: false, csatScore: 3, followUpWithin7Days: true },
+  { id: 'conv_005', customerMessage: "What integrations do you support with project management tools? Specifically Jira, Asana, and Monday.com?", finResponse: "We currently support native integrations with Jira and Asana. Monday.com integration is available via our Zapier connector.", resolved: true, csatScore: 4 },
+  { id: 'conv_006', customerMessage: "I think my account was accessed without my permission. There were logins from an IP I don't recognise in Germany.", finResponse: "For security concerns, I recommend immediately changing your password and enabling two-factor authentication. Please email security@company.com urgently.", resolved: true, csatScore: 5 },
+  { id: 'conv_007', customerMessage: "Can you automatically create a Jira ticket whenever a high-priority support conversation is escalated in Intercom?", finResponse: "Creating Jira tickets automatically based on conversation events would require a workflow automation setup. I can guide you through setting up a webhook.", resolved: false, csatScore: 2, followUpWithin7Days: true },
+  { id: 'conv_008', customerMessage: "How much does it cost to add 5 more seats to our Business plan?", finResponse: "Additional seats on the Business plan are priced at £45 per seat per month when billed annually. For 5 seats, that would be £225 per month or £2,700 annually.", resolved: true, csatScore: 5 },
+  { id: 'conv_009', customerMessage: "Your Fin AI agent gave my customer completely wrong information about our return policy. It said we offer 60-day returns but we only do 30 days.", finResponse: "If Fin stated 60 days, there may be conflicting information in your help articles or custom instructions. I recommend reviewing your knowledge base for any outdated content.", resolved: false, csatScore: 1, followUpWithin7Days: true },
+  { id: 'conv_010', customerMessage: "I need to export all conversation data from the last 6 months in a format I can import into our data warehouse. What formats do you support?", finResponse: "You can export conversation data via our Reports section. We support CSV and JSON exports.", resolved: true, csatScore: 4 },
+  { id: 'conv_011', customerMessage: "Our enterprise SSO with Okta stopped working this morning. We're getting SAML assertion errors. This is blocking all 200 of our agents.", finResponse: "SAML assertion errors can occur due to certificate expiry, clock drift, or attribute mapping issues. I recommend contacting your dedicated Customer Success Manager immediately.", resolved: false, csatScore: 1, followUpWithin7Days: true },
+  { id: 'conv_012', customerMessage: "Can you send a proactive message to all customers who haven't logged in for 30 days with a re-engagement offer?", finResponse: "Sending proactive outbound messages to a segment of users based on inactivity would be done through our Outbound Messages feature.", resolved: true, csatScore: 4 },
+  { id: 'conv_013', customerMessage: "What's the difference between your Starter, Growth, and Enterprise plans in terms of AI conversation limits?", finResponse: "The Starter plan includes 500 AI-resolved conversations per month, the Growth plan includes 2,000, and the Enterprise plan has custom limits.", resolved: true, csatScore: 5 },
+  { id: 'conv_014', customerMessage: "I need to set up different escalation rules for our US team (9-5 EST) and our UK team (9-5 GMT). How do I configure timezone-aware routing?", finResponse: "Timezone-based routing can be configured in your Inbox settings under Teams and Hours.", resolved: true, csatScore: 4 },
+  { id: 'conv_015', customerMessage: "Can Fin read my customer's order history from Shopify to answer questions like 'where is my order' without me having to build a custom integration?", finResponse: "Fin can connect to Shopify via our native integration to access order data. Setup takes approximately 30 minutes.", resolved: false, csatScore: 2, followUpWithin7Days: true },
+  { id: 'conv_016', customerMessage: "We need Fin to automatically apply a 10% discount code to any customer who has been waiting more than 48 hours for a response. Can it do that?", finResponse: "Fin doesn't currently have the ability to automatically apply discount codes or take actions in your e-commerce platform based on wait time triggers.", resolved: false, csatScore: 3, followUpWithin7Days: true },
+  { id: 'conv_017', customerMessage: "What are your uptime SLAs for enterprise customers and how do we get compensated if you miss them?", finResponse: "Our Enterprise SLA guarantees 99.9% uptime. Service credits of 10% of monthly fees apply for each additional hour of downtime.", resolved: true, csatScore: 5 },
+  { id: 'conv_018', customerMessage: "I'm getting a rate limit error on your API: 429 Too Many Requests. We're only making about 100 calls per minute.", finResponse: "The API rate limit for your current plan is 100 requests per minute. I recommend implementing exponential backoff in your integration.", resolved: true, csatScore: 4 },
+  { id: 'conv_019', customerMessage: "Can you tell me if there are any known issues with the webhook endpoint today? We stopped receiving events about 2 hours ago.", finResponse: "I don't have access to real-time system status information. Please check our status page at status.company.com for any active incidents.", resolved: false, csatScore: 2 },
+  { id: 'conv_020', customerMessage: "How do I migrate our knowledge base from Zendesk to Intercom? We have about 400 articles.", finResponse: "You can import help articles from Zendesk using our migration tool in Settings > Help Center > Import. For 400 articles, the migration typically takes 15-30 minutes.", resolved: true, csatScore: 4 },
+]
+
+export const sampleAnalysisResult: AnalysisResult = {
+  totalConversations: 20,
+  reportedResolutionRate: 78,
+  genuineResolutionRate: 51,
+  assumedResolutionCount: 9,
+  failureBreakdown: {
+    genuine_resolution: 10,
+    knowledge_gap: 4,
+    missing_primitive: 3,
+    ambiguous_query: 1,
+    instruction_conflict: 1,
+    out_of_scope: 1,
+  },
+  classifiedConversations: [
+    { ...sampleConversations[0], genuinelyResolved: false, failureCategory: 'knowledge_gap', confidenceScore: 88, explanation: "Customer reopened and followed up the next day, confirming the issue was not actually resolved.", recommendedFix: "Create a dedicated refund request flow article covering prorated refunds, cancellation windows, and billing cycle edge cases." },
+    { ...sampleConversations[1], genuinelyResolved: false, failureCategory: 'knowledge_gap', confidenceScore: 95, explanation: "Fin explicitly stated it lacked information on Salesforce OAuth integration, escalating rather than resolving.", recommendedFix: "Add a comprehensive OAuth 2.0 integration guide covering Salesforce, HubSpot, and Pipedream with token exchange troubleshooting steps." },
+    { ...sampleConversations[2], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 97, explanation: "Fin provided precise, accurate compliance information and the customer gave a 5-star rating with no follow-up.", recommendedFix: "No action needed — this is a model of successful resolution." },
+    { ...sampleConversations[3], genuinelyResolved: false, failureCategory: 'missing_primitive', confidenceScore: 92, explanation: "Fin could not action the refund itself and had to escalate, representing a missing action primitive.", recommendedFix: "Build a Fin Action to process partial refunds via the billing API, allowing Fin to resolve refund requests without human escalation." },
+    { ...sampleConversations[4], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 91, explanation: "Accurate integration information provided, 4-star CSAT, no follow-up contact.", recommendedFix: "No action needed." },
+    { ...sampleConversations[5], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 96, explanation: "Security guidance was appropriate and actionable, 5-star rating, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[6], genuinelyResolved: false, failureCategory: 'missing_primitive', confidenceScore: 90, explanation: "Fin described the capability but could not execute the integration action itself, leaving the customer to build it manually.", recommendedFix: "Create a Fin Action for triggering Jira ticket creation via webhook, so Fin can complete this task end-to-end." },
+    { ...sampleConversations[7], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 98, explanation: "Precise pricing information with a proactive upgrade offer, 5-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[8], genuinelyResolved: false, failureCategory: 'instruction_conflict', confidenceScore: 87, explanation: "Conflicting return policy data in the knowledge base caused Fin to provide incorrect information, directly damaging customer trust.", recommendedFix: "Audit all return policy references across help articles and custom instructions. Remove or consolidate duplicates into a single authoritative article." },
+    { ...sampleConversations[9], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 93, explanation: "Correct export guidance with format details, 4-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[10], genuinelyResolved: false, failureCategory: 'out_of_scope', confidenceScore: 89, explanation: "Enterprise SSO debugging is outside Fin's configured scope; the appropriate action was human escalation.", recommendedFix: "Define a clear escalation path in Fin's instructions for enterprise SSO failures with SLA-bound response time commitments." },
+    { ...sampleConversations[11], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 90, explanation: "Correct feature guidance with actionable next steps, 4-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[12], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 96, explanation: "Accurate plan comparison with clear limits, 5-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[13], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 93, explanation: "Correct routing configuration guidance, 4-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[14], genuinelyResolved: false, failureCategory: 'ambiguous_query', confidenceScore: 83, explanation: "Customer wanted a no-code solution but Fin's response about a 'native Shopify integration' was misleading given the actual setup complexity.", recommendedFix: "Clarify in the Shopify integration article what 'native' means in terms of setup steps, and update Fin's instructions to set accurate expectations." },
+    { ...sampleConversations[15], genuinelyResolved: false, failureCategory: 'missing_primitive', confidenceScore: 94, explanation: "Fin correctly identified the capability gap — this action requires an API integration that Fin cannot execute.", recommendedFix: "Build a Fin Action that can apply discount codes via the e-commerce platform API, unlocking a high-value retention use case." },
+    { ...sampleConversations[16], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 95, explanation: "Precise SLA information, 5-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[17], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 92, explanation: "Accurate rate limit information with actionable fix, 4-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+    { ...sampleConversations[18], genuinelyResolved: false, failureCategory: 'knowledge_gap', confidenceScore: 86, explanation: "Fin lacked access to real-time system status, a gap that left the customer without a resolution path.", recommendedFix: "Add a real-time status page link to Fin's knowledge base and configure Fin to proactively surface it for operational query types." },
+    { ...sampleConversations[19], genuinelyResolved: true, failureCategory: 'genuine_resolution', confidenceScore: 91, explanation: "Step-by-step migration guidance with timing expectations, 4-star CSAT, no follow-up.", recommendedFix: "No action needed." },
+  ],
+  kbHealthScore: 62,
+  kbCoverageScore: 58,
+  kbFreshnessScore: 71,
+  kbClarityScore: 67,
+  estimatedMonthlyCost: 2847,
+  estimatedWastedSpend: 891,
+  fixPlaybook: [
+    {
+      priority: 1,
+      category: 'knowledge_gap',
+      action: "Create a comprehensive OAuth 2.0 integration guide covering Salesforce, HubSpot, Zapier, and Pipedream with token exchange troubleshooting steps and code examples",
+      estimatedImpact: "+12% genuine resolution rate",
+      effort: 'medium',
+      detail: "4 of your top failure conversations involved API integration questions Fin couldn't answer. A single well-structured integration hub article would deflect these. Estimated production time: 3-4 hours with your dev team."
+    },
+    {
+      priority: 1,
+      category: 'missing_primitive',
+      action: "Build a Fin Action to process partial refunds and subscription credits via the billing API, eliminating the need for human escalation on refund requests",
+      estimatedImpact: "+8% genuine resolution rate",
+      effort: 'high',
+      detail: "Refund-related conversations are among your highest-volume failure categories. A Fin Action connected to your billing system would allow Fin to resolve these end-to-end. This accelerates time to value for the customer and reduces agent load."
+    },
+    {
+      priority: 1,
+      category: 'instruction_conflict',
+      action: "Audit all return and refund policy references across your help centre — search for '30 day', '60 day', 'return window' and consolidate into one canonical article",
+      estimatedImpact: "+6% genuine resolution rate",
+      effort: 'low',
+      detail: "Conflicting policy information is the most damaging failure type — it causes Fin to actively misinform customers. Your KB currently has at least one return policy conflict. A 30-minute audit would identify and fix this."
+    },
+    {
+      priority: 2,
+      category: 'missing_primitive',
+      action: "Build a Fin Action to apply discount codes and promotional credits via your e-commerce platform API, triggered by conversation context or customer wait time",
+      estimatedImpact: "+7% genuine resolution rate",
+      effort: 'high',
+      detail: "The ability to apply discounts is a powerful retention primitive. Fin currently has to decline these requests entirely. With this action in place, Fin could proactively offer retention discounts — a 0-to-1 deployment capability that dramatically improves resolution quality."
+    },
+    {
+      priority: 2,
+      category: 'knowledge_gap',
+      action: "Add a real-time system status widget or direct link to status.company.com in Fin's knowledge base, and configure Fin to surface it automatically for operational queries",
+      estimatedImpact: "+4% genuine resolution rate",
+      effort: 'low',
+      detail: "When customers report outages or missing events, Fin currently has no way to provide status information. Adding a status page reference is a 15-minute fix with immediate impact."
+    },
+    {
+      priority: 2,
+      category: 'ambiguous_query',
+      action: "Rewrite the Shopify integration article to clearly distinguish between 'native integration' setup complexity and no-code alternatives, with a requirements checklist at the top",
+      estimatedImpact: "+3% genuine resolution rate",
+      effort: 'low',
+      detail: "The term 'native integration' is creating false expectations. Adding a plain-language requirements section ('You will need: Shopify admin access, 30 minutes, no code required') eliminates ambiguity."
+    },
+    {
+      priority: 3,
+      category: 'missing_primitive',
+      action: "Create a Jira ticket creation Fin Action triggered by conversation escalation events, eliminating the manual webhook configuration step for ops teams",
+      estimatedImpact: "+5% genuine resolution rate",
+      effort: 'medium',
+      detail: "Customers asking about Jira automation are typically ops or IT leads — high-value accounts. Resolving this end-to-end with a Fin Action demonstrates product shape completeness in the enterprise workflow integration space."
+    },
+    {
+      priority: 3,
+      category: 'out_of_scope',
+      action: "Define an enterprise escalation playbook in Fin's instructions: for SSO, security incidents, and billing emergencies, Fin should immediately page the CSM and confirm SLA response time to the customer",
+      estimatedImpact: "+3% genuine resolution rate",
+      effort: 'low',
+      detail: "Out-of-scope escalations are currently handled inconsistently. A clear Fin instruction defining escalation triggers and SLA commitments converts these from failures into 'resolved by escalation' outcomes."
+    }
+  ]
+}
