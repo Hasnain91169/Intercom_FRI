@@ -5,6 +5,8 @@ import {
   AnalysisResult,
   FailureCategory,
   PlaybookItem,
+  RoadmapSignal,
+  MissingPrimitive,
 } from './types'
 
 const client = new Anthropic()
@@ -168,7 +170,7 @@ async function generatePlaybook(
     suggestedFix: c.recommendedFix,
   }))
 
-  const prompt = `You are a senior Intercom implementation consultant. Based on this analysis of a Fin AI agent deployment, generate a prioritised fix playbook.
+  const prompt = `You are a Senior Forward Deployed Engineer at Intercom. Based on this analysis of a Fin AI agent deployment, generate a prioritised fix playbook.
 
 Failure breakdown by category:
 ${JSON.stringify(failureBreakdown, null, 2)}
@@ -180,7 +182,7 @@ Generate 6-8 specific, prioritised actions. Each action should:
 - Be concrete and specific (not "improve your KB" but "Create an article on X covering Y and Z")
 - Have a realistic estimated resolution rate impact
 - Be ranked by impact/effort ratio
-- Reference "missing primitive" and "accelerate time to value" where genuinely applicable
+- For missing_primitive items: include an "implementationSketch" field with specific API calls, data flow steps, estimated build time, and required API scopes — exactly what an FDE would prototype with the customer's team
 
 Respond ONLY with valid JSON array:
 [{
@@ -189,7 +191,8 @@ Respond ONLY with valid JSON array:
   "action": "specific action title (max 120 chars)",
   "estimatedImpact": "+X% genuine resolution rate",
   "effort": "low, medium, or high",
-  "detail": "2-3 sentence explanation of why this matters and how to implement it"
+  "detail": "2-3 sentence explanation of why this matters and how to implement it",
+  "implementationSketch": "For missing_primitive only: concrete implementation steps, API names, estimated days. Omit for other categories."
 }]`
 
   const response = await client.messages.create({
@@ -207,6 +210,97 @@ Respond ONLY with valid JSON array:
   }
 
   return JSON.parse(text) as PlaybookItem[]
+}
+
+function calculateDeploymentScore(
+  genuineResolutionRate: number,
+  kbHealthScore: number,
+  failureBreakdown: Record<FailureCategory, number>,
+  totalConversations: number
+): number {
+  const missingPrimitivePct = (failureBreakdown.missing_primitive ?? 0) / totalConversations
+  const conflictPct = (failureBreakdown.instruction_conflict ?? 0) / totalConversations
+  const score =
+    genuineResolutionRate * 0.5 +
+    kbHealthScore * 0.3 +
+    20 -
+    missingPrimitivePct * 25 -
+    conflictPct * 20
+  return Math.max(0, Math.min(100, Math.round(score)))
+}
+
+async function generateRoadmapSignal(
+  classified: ClassifiedConversation[],
+  failureBreakdown: Record<FailureCategory, number>
+): Promise<RoadmapSignal> {
+  const primitiveFailures = classified.filter((c) => c.failureCategory === 'missing_primitive')
+  if (primitiveFailures.length === 0) {
+    return {
+      missingPrimitiveCount: 0,
+      topPrimitives: [],
+      estimatedResolutionRecovery: 'No missing primitives detected',
+      prioritySummary: 'This deployment has no missing primitive failures. Focus on KB quality improvements.',
+    }
+  }
+
+  const failureSummary = primitiveFailures.map((c) => ({
+    customerQuery: c.customerMessage.substring(0, 150),
+    finResponse: c.finResponse.substring(0, 150),
+    explanation: c.explanation,
+    recommendedFix: c.recommendedFix,
+  }))
+
+  const prompt = `You are a Senior Forward Deployed Engineer at Intercom preparing a structured product feedback document for the R&D team.
+
+These conversations failed because Fin lacked an action primitive:
+${JSON.stringify(failureSummary, null, 2)}
+
+Total failure breakdown for context:
+${JSON.stringify(failureBreakdown, null, 2)}
+
+Generate a Roadmap Signal document identifying the top missing primitives. For each primitive, describe:
+- What action the customer needed Fin to take
+- What the customer experienced instead
+- What native Fin product capability would prevent this
+- A concrete implementation sketch (specific API, data flow, estimated build days)
+- Which external API is required
+
+Respond ONLY with valid JSON:
+{
+  "missingPrimitiveCount": number,
+  "estimatedResolutionRecovery": "+X% genuine resolution rate if top primitives are built",
+  "prioritySummary": "One sentence for the R&D handoff note",
+  "topPrimitives": [{
+    "name": "Short primitive name (e.g. 'Billing Action — Partial Refund')",
+    "frequency": number of conversations affected,
+    "customerImpact": "What the customer experienced",
+    "productInput": "What Fin would need natively",
+    "estimatedBuildDays": "X–Y days",
+    "apiDependency": "Specific API name"
+  }]
+}`
+
+  const response = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2000,
+    messages: [{ role: 'user', content: prompt }],
+  })
+
+  const content = response.content[0]
+  if (content.type !== 'text') throw new Error('Unexpected roadmap signal response')
+
+  let text = content.text.trim()
+  if (text.startsWith('```')) {
+    text = text.replace(/^```(?:json)?\n?/, '').replace(/\n?```$/, '')
+  }
+
+  const parsed = JSON.parse(text)
+  return {
+    missingPrimitiveCount: primitiveFailures.length,
+    estimatedResolutionRecovery: parsed.estimatedResolutionRecovery,
+    prioritySummary: parsed.prioritySummary,
+    topPrimitives: (parsed.topPrimitives ?? []) as MissingPrimitive[],
+  }
 }
 
 export async function analyseConversations(conversations: Conversation[]): Promise<AnalysisResult> {
@@ -265,13 +359,22 @@ export async function analyseConversations(conversations: Conversation[]): Promi
   console.log('[FRI] Scoring knowledge base health')
   const kbScores = await scoreKBHealth(conversations)
 
-  // Step 4: Generate fix playbook
-  console.log('[FRI] Generating fix playbook')
-  const fixPlaybook = await generatePlaybook(failureBreakdown, classifiedConversations)
+  // Step 4: Generate fix playbook + roadmap signal in parallel
+  console.log('[FRI] Generating fix playbook and roadmap signal')
+  const [fixPlaybook, roadmapSignal] = await Promise.all([
+    generatePlaybook(failureBreakdown, classifiedConversations),
+    generateRoadmapSignal(classifiedConversations, failureBreakdown),
+  ])
 
-  // Step 5: ROI calculation
+  // Step 5: ROI + deployment score calculation
   const estimatedMonthlyCost = conversations.length * 0.99
   const estimatedWastedSpend = Math.max(0, assumedResolutionCount) * 0.99
+  const deploymentScore = calculateDeploymentScore(
+    genuineResolutionRate,
+    kbScores.kbHealthScore,
+    failureBreakdown,
+    conversations.length
+  )
 
   console.log('[FRI] Analysis complete')
 
@@ -286,5 +389,7 @@ export async function analyseConversations(conversations: Conversation[]): Promi
     estimatedMonthlyCost,
     estimatedWastedSpend,
     fixPlaybook,
+    deploymentScore,
+    roadmapSignal,
   }
 }

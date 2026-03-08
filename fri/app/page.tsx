@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BarChart3, Layers, Zap, ArrowRight, Loader2 } from 'lucide-react'
+import { BarChart3, Layers, Zap, ArrowRight, Loader2, Quote } from 'lucide-react'
 import UploadZone from '@/components/UploadZone'
 import { Conversation } from '@/lib/types'
 import { sampleConversations, sampleAnalysisResult } from '@/lib/sampleData'
@@ -130,6 +130,49 @@ export default function HomePage() {
             <span className="text-white font-medium">$0.99 resolutions</span>{' '}
             are actually worth
           </p>
+        </div>
+
+        {/* Problem validation — real customer signal */}
+        <div className="mb-14 max-w-4xl mx-auto">
+          <div className="flex items-center gap-2 mb-5 justify-center">
+            <div className="h-px flex-1 bg-slate-800" />
+            <span className="text-slate-500 text-xs uppercase tracking-widest">Real customer feedback that built this tool</span>
+            <div className="h-px flex-1 bg-slate-800" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              {
+                quote: "The most conversations that are 'resolved' are actually 'assumed resolved' — and they cost $0.99 too.",
+                source: "Mid-market customer, G2 review",
+                highlight: true,
+              },
+              {
+                quote: "It is hard to know where to change something in order to make Fin respond better for future conversations.",
+                source: "SMB customer, G2 review",
+                highlight: false,
+              },
+              {
+                quote: "Fin's responses may come across as generic or may lack the necessary context when handling more complex queries.",
+                source: "Enterprise customer, G2 review",
+                highlight: false,
+              },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className={`p-4 rounded-xl border relative ${
+                  item.highlight
+                    ? 'bg-blue-500/10 border-blue-500/30'
+                    : 'bg-slate-800/40 border-slate-700/50'
+                }`}
+              >
+                <Quote className={`w-4 h-4 mb-2 ${item.highlight ? 'text-blue-400' : 'text-slate-600'}`} />
+                <p className={`text-sm leading-relaxed mb-3 ${item.highlight ? 'text-slate-200' : 'text-slate-400'}`}>
+                  {item.quote}
+                </p>
+                <p className="text-slate-600 text-xs">{item.source}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Three-column explainer */}

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Copy, Check, Zap } from 'lucide-react'
+import { Copy, Check, Zap, Terminal } from 'lucide-react'
 import { PlaybookItem, FailureCategory } from '@/lib/types'
 
 interface FixPlaybookProps {
@@ -128,10 +128,20 @@ export default function FixPlaybook({ items }: FixPlaybookProps) {
             </button>
 
             {expanded === index && (
-              <div className="px-4 pb-4">
+              <div className="px-4 pb-4 space-y-3">
                 <div className="ml-10 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50">
                   <p className="text-slate-300 text-sm leading-relaxed">{item.detail}</p>
                 </div>
+                {item.implementationSketch && (
+                  <div className="ml-10 p-3 rounded-lg bg-slate-900/60 border border-purple-500/20">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Terminal className="w-3.5 h-3.5 text-purple-400" />
+                      <span className="text-purple-400 text-xs font-medium uppercase tracking-wide">Implementation sketch</span>
+                      <span className="text-slate-600 text-xs ml-1">· what I&apos;d prototype with the customer&apos;s team</span>
+                    </div>
+                    <p className="text-slate-300 text-xs font-mono leading-relaxed whitespace-pre-wrap">{item.implementationSketch}</p>
+                  </div>
+                )}
               </div>
             )}
           </div>

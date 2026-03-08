@@ -32,6 +32,23 @@ export interface PlaybookItem {
   estimatedImpact: string
   effort: 'low' | 'medium' | 'high'
   detail: string
+  implementationSketch?: string // For missing_primitive items: what an FDE would build
+}
+
+export interface MissingPrimitive {
+  name: string
+  frequency: number              // how many conversations failed because of this
+  customerImpact: string         // what the customer experienced
+  productInput: string           // what Fin would need natively to solve this
+  estimatedBuildDays: string     // e.g. "2–3 days"
+  apiDependency: string          // e.g. "Stripe Billing API"
+}
+
+export interface RoadmapSignal {
+  missingPrimitiveCount: number
+  topPrimitives: MissingPrimitive[]
+  estimatedResolutionRecovery: string  // e.g. "+18% genuine resolution rate if built"
+  prioritySummary: string              // one sentence for R&D handoff
 }
 
 export interface AnalysisResult {
@@ -48,4 +65,6 @@ export interface AnalysisResult {
   estimatedMonthlyCost: number
   estimatedWastedSpend: number
   fixPlaybook: PlaybookItem[]
+  deploymentScore: number        // 0–100 overall Fin deployment health score
+  roadmapSignal: RoadmapSignal   // structured output for R&D / product feedback
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   BarChart3,
@@ -16,6 +16,9 @@ import FailureClassifierChart from '@/components/FailureClassifierChart'
 import KBHealthPanel from '@/components/KBHealthPanel'
 import ROIDashboard from '@/components/ROIDashboard'
 import FixPlaybook from '@/components/FixPlaybook'
+import DeploymentScore from '@/components/DeploymentScore'
+import MissingPrimitiveCallout from '@/components/MissingPrimitiveCallout'
+import RoadmapSignal from '@/components/RoadmapSignal'
 
 const FAILURE_LABELS: Record<FailureCategory, string> = {
   genuine_resolution: 'Genuine',
@@ -145,6 +148,7 @@ export default function ResultsPage() {
   const [isDemo, setIsDemo] = useState(false)
   const [activeCategory, setActiveCategory] = useState<FailureCategory | null>(null)
   const [page, setPage] = useState(1)
+  const roadmapRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('fri_result')
@@ -179,9 +183,14 @@ export default function ResultsPage() {
     setPage(1)
   }
 
+  const scrollToRoadmap = () => {
+    roadmapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
   const handleDownload = () => {
     const report = {
       generatedAt: new Date().toISOString(),
+      deploymentScore: result.deploymentScore,
       summary: {
         totalConversations: result.totalConversations,
         reportedResolutionRate: `${result.reportedResolutionRate}%`,
@@ -191,6 +200,7 @@ export default function ResultsPage() {
         kbHealthScore: result.kbHealthScore,
       },
       failureBreakdown: result.failureBreakdown,
+      roadmapSignal: result.roadmapSignal,
       fixPlaybook: result.fixPlaybook,
     }
     const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
@@ -207,6 +217,8 @@ export default function ResultsPage() {
     currency: 'GBP',
     maximumFractionDigits: 0,
   }).format(result.estimatedWastedSpend)
+
+  const missingPrimitiveCount = result.failureBreakdown.missing_primitive ?? 0
 
   return (
     <div className="min-h-screen bg-[#0F172A] text-white">
@@ -245,7 +257,15 @@ export default function ResultsPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+
+        {/* Deployment Score — the single number at a glance */}
+        <DeploymentScore
+          score={result.deploymentScore}
+          genuineResolutionRate={result.genuineResolutionRate}
+          kbHealthScore={result.kbHealthScore}
+        />
+
         {/* Hero metric row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <MetricCard
@@ -275,6 +295,17 @@ export default function ResultsPage() {
             variant="red"
           />
         </div>
+
+        {/* Missing Primitive callout — shown prominently when detected */}
+        {missingPrimitiveCount > 0 && (
+          <MissingPrimitiveCallout
+            missingPrimitiveCount={missingPrimitiveCount}
+            totalConversations={result.totalConversations}
+            onViewDetails={scrollToRoadmap}
+            activeCategory={activeCategory}
+            onCategoryClick={handleCategoryFilter}
+          />
+        )}
 
         {/* Row 2: Resolution quality + KB health */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -308,8 +339,15 @@ export default function ResultsPage() {
           />
         </div>
 
-        {/* Fix Playbook */}
+        {/* Fix Playbook (with implementation sketches for missing_primitive items) */}
         <FixPlaybook items={result.fixPlaybook} />
+
+        {/* Roadmap Signal — FDE → R&D product feedback */}
+        {result.roadmapSignal && result.roadmapSignal.missingPrimitiveCount > 0 && (
+          <div ref={roadmapRef}>
+            <RoadmapSignal signal={result.roadmapSignal} />
+          </div>
+        )}
 
         {/* Conversation table */}
         <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 overflow-hidden">
@@ -351,12 +389,9 @@ export default function ResultsPage() {
             </table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="px-6 py-4 border-t border-slate-700/50 flex items-center justify-between">
-              <p className="text-slate-400 text-sm">
-                Page {page} of {totalPages}
-              </p>
+              <p className="text-slate-400 text-sm">Page {page} of {totalPages}</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
