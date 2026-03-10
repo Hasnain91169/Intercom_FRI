@@ -26,10 +26,10 @@ export default function ResolutionScoreCard({
   ].filter((d) => d.value > 0)
 
   return (
-    <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700/50 h-full">
-      <h3 className="font-semibold text-white mb-1">Resolution Quality Split</h3>
-      <p className="text-slate-400 text-sm mb-6">
-        Fin reported <span className="text-white font-medium">{reportedResolutionRate}%</span> resolved.
+    <div className="p-6 rounded-xl bg-white/[0.025] border border-white/[0.07] h-full">
+      <h3 className="font-semibold text-white text-[15px] mb-1">Resolution Quality Split</h3>
+      <p className="text-white/40 text-sm mb-6">
+        Fin reported <span className="text-white/80 font-medium">{reportedResolutionRate}%</span> resolved.
         FRI found <span className="text-blue-400 font-medium">{genuineResolutionRate}%</span> genuinely resolved.
       </p>
 
@@ -53,8 +53,8 @@ export default function ResolutionScoreCard({
               </Pie>
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#1E293B',
-                  border: '1px solid #334155',
+                  backgroundColor: '#0d1117',
+                  border: '1px solid rgba(255,255,255,0.1)',
                   borderRadius: '8px',
                   color: '#fff',
                   fontSize: '12px',
@@ -65,7 +65,7 @@ export default function ResolutionScoreCard({
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-2xl font-bold text-blue-400">{genuineResolutionRate}%</span>
-            <span className="text-slate-400 text-xs">genuine</span>
+            <span className="text-white/30 text-xs">genuine</span>
           </div>
         </div>
 
@@ -73,12 +73,12 @@ export default function ResolutionScoreCard({
           {data.map((item) => (
             <div key={item.name} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                <span className="text-slate-300 text-sm">{item.name}</span>
+                <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                <span className="text-white/50 text-sm">{item.name}</span>
               </div>
               <div className="text-right">
-                <span className="text-white font-medium text-sm">{item.value}</span>
-                <span className="text-slate-500 text-xs ml-1">
+                <span className="text-white/80 font-medium text-sm">{item.value}</span>
+                <span className="text-white/25 text-xs ml-1">
                   ({Math.round((item.value / totalConversations) * 100)}%)
                 </span>
               </div>
@@ -87,11 +87,11 @@ export default function ResolutionScoreCard({
         </div>
       </div>
 
-      <div className="mt-6 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+      <div className="mt-6 p-3 rounded-lg bg-amber-500/[0.06] border border-amber-500/15">
         <p className="text-amber-400 text-xs font-medium">
           {assumedResolutionCount} assumed resolution{assumedResolutionCount !== 1 ? 's' : ''} detected
         </p>
-        <p className="text-slate-400 text-xs mt-0.5">
+        <p className="text-white/35 text-xs mt-0.5">
           Conversations closed without customer confirmation — you paid $0.99 for each.
         </p>
       </div>

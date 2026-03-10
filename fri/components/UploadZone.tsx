@@ -57,10 +57,10 @@ export default function UploadZone({ onConversationsLoaded, onError }: UploadZon
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
         className={`
-          relative flex flex-col items-center justify-center w-full h-52 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200
+          relative flex flex-col items-center justify-center w-full h-48 rounded-xl border-2 border-dashed cursor-pointer transition-all duration-200
           ${isDragging
-            ? 'border-blue-400 bg-blue-500/10'
-            : 'border-slate-600 bg-slate-800/50 hover:border-slate-500 hover:bg-slate-800'
+            ? 'border-blue-400/50 bg-blue-500/[0.06]'
+            : 'border-white/[0.1] bg-white/[0.02] hover:border-white/[0.18] hover:bg-white/[0.04]'
           }
         `}
       >
@@ -73,29 +73,29 @@ export default function UploadZone({ onConversationsLoaded, onError }: UploadZon
         />
         {isProcessing ? (
           <div className="flex flex-col items-center gap-3">
-            <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-            <p className="text-slate-400 text-sm">Parsing CSV...</p>
+            <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+            <p className="text-white/35 text-sm">Parsing CSV...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center gap-3 px-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center">
-              <Upload className="w-5 h-5 text-slate-400" />
+            <div className="w-10 h-10 rounded-xl bg-white/[0.05] border border-white/[0.08] flex items-center justify-center">
+              <Upload className="w-4 h-4 text-white/40" />
             </div>
             <div>
-              <p className="text-white font-medium">Drop your CSV here, or click to browse</p>
-              <p className="text-slate-400 text-sm mt-1">Max 5MB · Up to 100 conversations</p>
+              <p className="text-white/70 font-medium text-[15px]">Drop your CSV here, or click to browse</p>
+              <p className="text-white/25 text-sm mt-1">Max 5MB · Up to 100 conversations</p>
             </div>
           </div>
         )}
       </label>
 
       {/* Expected columns */}
-      <div className="mt-4 p-4 rounded-lg bg-slate-800/40 border border-slate-700/50">
-        <div className="flex items-center gap-2 mb-2">
-          <FileText className="w-4 h-4 text-slate-400" />
-          <span className="text-slate-400 text-xs font-medium uppercase tracking-wide">Expected CSV columns</span>
+      <div className="mt-4 p-4 rounded-lg bg-white/[0.025] border border-white/[0.07]">
+        <div className="flex items-center gap-2 mb-3">
+          <FileText className="w-3.5 h-3.5 text-white/30" />
+          <span className="text-white/30 text-xs font-medium uppercase tracking-wide">Expected CSV columns</span>
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {[
             { name: 'id', required: true },
             { name: 'customer_message', required: true },
@@ -109,19 +109,19 @@ export default function UploadZone({ onConversationsLoaded, onError }: UploadZon
               key={col.name}
               className={`text-xs px-2 py-1 rounded font-mono ${
                 col.required
-                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                  : 'bg-slate-700/50 text-slate-400 border border-slate-600/50'
+                  ? 'bg-blue-500/[0.12] text-blue-300/80 border border-blue-500/20'
+                  : 'bg-white/[0.04] text-white/30 border border-white/[0.07]'
               }`}
             >
               {col.name}
-              {col.required && <span className="ml-1 text-blue-400">*</span>}
+              {col.required && <span className="ml-1 text-blue-400/60">*</span>}
             </span>
           ))}
         </div>
-        <p className="text-slate-500 text-xs mt-2">* Required columns</p>
+        <p className="text-white/20 text-xs mt-2">* Required columns</p>
       </div>
 
-      <div className="mt-3 flex items-start gap-2 text-slate-500 text-xs">
+      <div className="mt-3 flex items-start gap-2 text-white/20 text-xs">
         <AlertCircle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
         <span>Don&apos;t have Fin data yet? Use the sample dataset below to see a full demo.</span>
       </div>

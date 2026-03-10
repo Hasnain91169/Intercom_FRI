@@ -23,7 +23,7 @@ function ScoreGauge({ score, label, description }: { score: number; label: strin
             cy="32"
             r="28"
             fill="none"
-            stroke="#334155"
+            stroke="rgba(255,255,255,0.07)"
             strokeWidth="6"
           />
           <circle
@@ -67,11 +67,11 @@ export default function KBHealthPanel({
   const rating = getRating(kbHealthScore)
 
   return (
-    <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700/50 h-full">
+    <div className="p-6 rounded-xl bg-white/[0.025] border border-white/[0.07] h-full">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h3 className="font-semibold text-white mb-1">Knowledge Base Health</h3>
-          <p className="text-slate-400 text-sm">
+          <h3 className="font-semibold text-white text-[15px] mb-1">Knowledge Base Health</h3>
+          <p className="text-white/40 text-sm">
             Product shape assessment — based on Fin&apos;s response quality
           </p>
         </div>
@@ -101,11 +101,11 @@ export default function KBHealthPanel({
 
       {/* Health bar */}
       <div className="space-y-2">
-        <div className="flex justify-between text-xs text-slate-400">
+        <div className="flex justify-between text-xs text-white/30">
           <span>Overall KB Health Score</span>
           <span>{kbHealthScore}/100</span>
         </div>
-        <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
+        <div className="h-[3px] bg-white/[0.08] rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-1000"
             style={{
@@ -118,8 +118,8 @@ export default function KBHealthPanel({
       </div>
 
       {kbHealthScore < 70 && (
-        <div className="mt-4 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50">
-          <p className="text-slate-300 text-xs">
+        <div className="mt-4 p-3 rounded-lg bg-white/[0.03] border border-white/[0.07]">
+          <p className="text-white/50 text-xs">
             <span className="text-amber-400 font-medium">Incomplete product shape detected.</span>{' '}
             Your KB has gaps that are causing Fin to deflect or give vague answers. The fix playbook below identifies the highest-impact improvements.
           </p>

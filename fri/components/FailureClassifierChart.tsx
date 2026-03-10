@@ -76,16 +76,16 @@ export default function FailureClassifierChart({
   }
 
   return (
-    <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700/50">
+    <div className="p-6 rounded-xl bg-white/[0.025] border border-white/[0.07]">
       <div className="flex items-start justify-between mb-6">
         <div>
-          <h3 className="font-semibold text-white mb-1">Failure Category Breakdown</h3>
-          <p className="text-slate-400 text-sm">Click a bar to filter the conversation table below</p>
+          <h3 className="font-semibold text-white text-[15px] mb-1">Failure Category Breakdown</h3>
+          <p className="text-white/35 text-sm">Click a bar to filter the conversation table below</p>
         </div>
         {activeCategory && (
           <button
             onClick={() => onCategoryClick(null)}
-            className="text-xs text-slate-400 hover:text-white transition-colors border border-slate-600 px-2 py-1 rounded"
+            className="text-xs text-white/40 hover:text-white/70 transition-colors border border-white/[0.08] hover:border-white/[0.14] px-2.5 py-1 rounded-lg"
           >
             Clear filter
           </button>
@@ -104,15 +104,15 @@ export default function FailureClassifierChart({
               type="category"
               dataKey="label"
               width={150}
-              tick={{ fill: '#94A3B8', fontSize: 12 }}
+              tick={{ fill: 'rgba(255,255,255,0.35)', fontSize: 12 }}
               tickLine={false}
               axisLine={false}
             />
             <Tooltip
               cursor={{ fill: 'rgba(255,255,255,0.03)' }}
               contentStyle={{
-                backgroundColor: '#1E293B',
-                border: '1px solid #334155',
+                backgroundColor: '#0d1117',
+                border: '1px solid rgba(255,255,255,0.1)',
                 borderRadius: '8px',
                 color: '#fff',
                 fontSize: '12px',
@@ -147,24 +147,24 @@ export default function FailureClassifierChart({
               onClick={() => handleClick(item)}
               className={`flex items-start gap-2.5 p-2.5 rounded-lg text-left transition-all ${
                 activeCategory === item.category
-                  ? 'bg-slate-700/80 border border-slate-600'
-                  : 'hover:bg-slate-700/40'
+                  ? 'bg-white/[0.06] border border-white/[0.12]'
+                  : 'hover:bg-white/[0.03]'
               }`}
             >
               <div
-                className="w-2.5 h-2.5 rounded-full mt-1 shrink-0"
+                className="w-2 h-2 rounded-full mt-1 shrink-0"
                 style={{ backgroundColor: item.color }}
               />
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-white text-xs font-medium">{item.label}</span>
+                  <span className="text-white/70 text-xs font-medium">{item.label}</span>
                   {item.category === 'missing_primitive' && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-400 font-medium border border-purple-500/30">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] bg-purple-500/15 text-purple-400 font-medium border border-purple-500/20">
                       KEY
                     </span>
                   )}
                 </div>
-                <p className="text-slate-500 text-xs mt-0.5">
+                <p className="text-white/25 text-xs mt-0.5">
                   {CATEGORY_CONFIG[item.category].description}
                 </p>
               </div>

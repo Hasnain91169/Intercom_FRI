@@ -44,7 +44,6 @@ export default function HomePage() {
     setIsAnalysing(true)
     setProgressIndex(0)
 
-    // Demo mode: use pre-classified results directly
     if (isDemo) {
       let i = 0
       const interval = setInterval(() => {
@@ -62,7 +61,6 @@ export default function HomePage() {
       return
     }
 
-    // Real analysis via Claude API
     const progressInterval = setInterval(() => {
       setProgressIndex((i) => Math.min(i + 1, PROGRESS_MESSAGES.length - 2))
     }, 8000)
@@ -94,104 +92,131 @@ export default function HomePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0F172A] text-white">
-      {/* Header */}
-      <header className="border-b border-slate-800 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+    <main className="min-h-screen bg-[#06090E] text-white overflow-x-hidden">
+      {/* Nav — Intercom-style: minimal, dark, sticky */}
+      <header className="sticky top-0 z-50 border-b border-white/[0.06] bg-[#06090E]/90 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center">
-              <BarChart3 className="w-4 h-4 text-white" />
+            {/* FRI logomark — mimicking Intercom's icon style */}
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <BarChart3 className="w-3.5 h-3.5 text-white" />
             </div>
-            <span className="font-semibold text-lg tracking-tight">FRI</span>
-            <span className="text-slate-600 text-sm hidden sm:block">/ Fin Resolution Intelligence</span>
+            <span className="font-semibold text-[15px] tracking-tight">FRI</span>
+            <span className="text-white/20 text-sm hidden sm:block">·</span>
+            <span className="text-white/35 text-sm hidden sm:block">Fin Resolution Intelligence</span>
           </div>
           <a
             href="/sample_conversations.csv"
             download
-            className="text-slate-400 hover:text-slate-300 text-sm flex items-center gap-1.5 transition-colors"
+            className="text-white/40 hover:text-white/70 text-sm transition-colors duration-150"
           >
-            Download sample CSV
+            Sample CSV
           </a>
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        {/* Hero */}
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-6">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Powered by Claude AI
-          </div>
-          <h1 className="text-5xl font-bold tracking-tight mb-4">
-            Fin Resolution Intelligence
-          </h1>
-          <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-            Find out what your{' '}
-            <span className="text-white font-medium">$0.99 resolutions</span>{' '}
-            are actually worth
-          </p>
-        </div>
+      {/* Hero — with Intercom-style ambient glow behind the title */}
+      <div className="relative">
+        {/* Ambient glow — like Intercom's sphere */}
+        <div
+          className="absolute inset-x-0 top-0 h-[480px] pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 50% at 50% -10%, rgba(99, 102, 241, 0.18) 0%, rgba(59, 130, 246, 0.08) 40%, transparent 70%)',
+          }}
+        />
 
-        {/* Problem validation — real customer signal */}
-        <div className="mb-14 max-w-4xl mx-auto">
-          <div className="flex items-center gap-2 mb-5 justify-center">
-            <div className="h-px flex-1 bg-slate-800" />
-            <span className="text-slate-500 text-xs uppercase tracking-widest">Real customer feedback that built this tool</span>
-            <div className="h-px flex-1 bg-slate-800" />
+        <div className="max-w-6xl mx-auto px-6 pt-20 pb-16 relative">
+          {/* Badge */}
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-500/20 bg-blue-500/8 text-blue-400 text-xs font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              Powered by Claude AI
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          {/* Headline */}
+          <div className="text-center mb-5">
+            <h1 className="text-[52px] leading-[1.08] font-bold tracking-tight mb-5 text-white">
+              What are your{' '}
+              <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">
+                $0.99 resolutions
+              </span>
+              <br />
+              actually worth?
+            </h1>
+            <p className="text-white/50 text-xl max-w-xl mx-auto leading-relaxed">
+              FRI diagnoses Fin AI agent failures — so you know which resolutions are genuine and which are costing you money.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-6 pb-16">
+
+        {/* G2 validation — Intercom-style: subtle, clean */}
+        <div className="mb-16">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-px flex-1 bg-white/[0.06]" />
+            <span className="text-white/25 text-xs uppercase tracking-widest font-medium">Real customer signal that built this</span>
+            <div className="h-px flex-1 bg-white/[0.06]" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {[
               {
                 quote: "The most conversations that are 'resolved' are actually 'assumed resolved' — and they cost $0.99 too.",
-                source: "Mid-market customer, G2 review",
+                source: 'Mid-market customer, G2 review',
                 highlight: true,
               },
               {
-                quote: "It is hard to know where to change something in order to make Fin respond better for future conversations.",
-                source: "SMB customer, G2 review",
+                quote: 'It is hard to know where to change something in order to make Fin respond better for future conversations.',
+                source: 'SMB customer, G2 review',
                 highlight: false,
               },
               {
                 quote: "Fin's responses may come across as generic or may lack the necessary context when handling more complex queries.",
-                source: "Enterprise customer, G2 review",
+                source: 'Enterprise customer, G2 review',
                 highlight: false,
               },
             ].map((item, i) => (
               <div
                 key={i}
-                className={`p-4 rounded-xl border relative ${
+                className={`p-5 rounded-xl border relative transition-colors ${
                   item.highlight
-                    ? 'bg-blue-500/10 border-blue-500/30'
-                    : 'bg-slate-800/40 border-slate-700/50'
+                    ? 'bg-blue-500/[0.06] border-blue-500/20'
+                    : 'bg-white/[0.025] border-white/[0.07] hover:bg-white/[0.04]'
                 }`}
               >
-                <Quote className={`w-4 h-4 mb-2 ${item.highlight ? 'text-blue-400' : 'text-slate-600'}`} />
-                <p className={`text-sm leading-relaxed mb-3 ${item.highlight ? 'text-slate-200' : 'text-slate-400'}`}>
+                <Quote className={`w-3.5 h-3.5 mb-3 ${item.highlight ? 'text-blue-400' : 'text-white/20'}`} />
+                <p className={`text-sm leading-relaxed mb-4 ${item.highlight ? 'text-white/80' : 'text-white/40'}`}>
                   {item.quote}
                 </p>
-                <p className="text-slate-600 text-xs">{item.source}</p>
+                <p className="text-white/20 text-xs">{item.source}</p>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Three-column explainer */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-14">
+        {/* Feature pillars — Intercom-style cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-16">
           {[
             {
-              icon: <BarChart3 className="w-5 h-5 text-blue-400" />,
+              icon: <BarChart3 className="w-4 h-4 text-blue-400" />,
+              iconBg: 'bg-blue-500/10',
               title: 'Assumed vs. Genuine',
               description:
                 'Fin marks conversations resolved. FRI checks if they actually were — using reopens, CSAT, follow-ups, and AI classification.',
             },
             {
-              icon: <Layers className="w-5 h-5 text-purple-400" />,
+              icon: <Layers className="w-4 h-4 text-violet-400" />,
+              iconBg: 'bg-violet-500/10',
               title: '5 Failure Categories',
               description:
-                'KB gaps, missing primitives, ambiguous queries, instruction conflicts, and out-of-scope requests — each with a specific fix.',
+                'KB gaps, missing primitives, ambiguous queries, instruction conflicts, and out-of-scope — each with a specific fix.',
             },
             {
-              icon: <Zap className="w-5 h-5 text-amber-400" />,
+              icon: <Zap className="w-4 h-4 text-amber-400" />,
+              iconBg: 'bg-amber-500/10',
               title: 'Fix Playbook',
               description:
                 'Prioritised actions ranked by resolution rate impact vs. implementation effort — concrete steps, not generic advice.',
@@ -199,20 +224,20 @@ export default function HomePage() {
           ].map((item) => (
             <div
               key={item.title}
-              className="p-6 rounded-xl bg-slate-800/50 border border-slate-700/50 hover:border-slate-600/50 transition-colors"
+              className="p-5 rounded-xl bg-white/[0.025] border border-white/[0.07] hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-200"
             >
-              <div className="w-10 h-10 rounded-lg bg-slate-700/80 flex items-center justify-center mb-4">
+              <div className={`w-8 h-8 rounded-lg ${item.iconBg} flex items-center justify-center mb-4`}>
                 {item.icon}
               </div>
-              <h3 className="font-semibold mb-2">{item.title}</h3>
-              <p className="text-slate-400 text-sm leading-relaxed">{item.description}</p>
+              <h3 className="font-semibold text-[15px] mb-2 text-white">{item.title}</h3>
+              <p className="text-white/40 text-sm leading-relaxed">{item.description}</p>
             </div>
           ))}
         </div>
 
-        {/* Upload section */}
-        <div className="max-w-2xl mx-auto">
-          <div className="p-8 rounded-2xl bg-slate-800/30 border border-slate-700/50">
+        {/* Upload — centred, clean */}
+        <div className="max-w-xl mx-auto">
+          <div className="p-7 rounded-2xl bg-white/[0.025] border border-white/[0.07]">
             {!isAnalysing ? (
               <>
                 <UploadZone
@@ -226,42 +251,40 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {/* Sample data button */}
-                <div className="mt-6 text-center">
-                  <p className="text-slate-500 text-sm mb-3">— or —</p>
+                <div className="mt-5 text-center">
+                  <p className="text-white/20 text-xs mb-3">— or —</p>
                   <button
                     onClick={handleLoadSample}
-                    className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors underline underline-offset-2"
+                    className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
                   >
                     Load sample dataset (20 conversations)
                   </button>
                 </div>
 
-                {/* Loaded state */}
                 {conversations && (
-                  <div className="mt-6">
-                    <div className="flex items-center justify-between p-4 rounded-xl bg-slate-700/50 border border-slate-600/50 mb-4">
+                  <div className="mt-5">
+                    <div className="flex items-center justify-between p-4 rounded-xl bg-white/[0.04] border border-white/[0.08] mb-4">
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-medium text-white text-sm">{filename}</p>
                           {isDemo && (
-                            <span className="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 font-medium">
+                            <span className="px-1.5 py-0.5 rounded text-[11px] bg-blue-500/15 text-blue-400 border border-blue-500/25 font-medium">
                               DEMO
                             </span>
                           )}
                         </div>
-                        <p className="text-slate-400 text-sm mt-0.5">
-                          {conversations.length} conversations ready to analyse
+                        <p className="text-white/35 text-sm mt-0.5">
+                          {conversations.length} conversations ready
                         </p>
                       </div>
-                      <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
-                        <span className="text-green-400 text-lg">✓</span>
+                      <div className="w-7 h-7 rounded-full bg-green-500/15 flex items-center justify-center">
+                        <span className="text-green-400 text-sm">✓</span>
                       </div>
                     </div>
 
                     <button
                       onClick={handleAnalyse}
-                      className="w-full py-3.5 px-6 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold transition-colors flex items-center justify-center gap-2 group"
+                      className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 text-white font-semibold text-[15px] transition-all duration-200 flex items-center justify-center gap-2 group shadow-lg shadow-blue-500/20"
                     >
                       Analyse {conversations.length} conversations
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -270,43 +293,32 @@ export default function HomePage() {
                 )}
               </>
             ) : (
-              /* Loading state */
-              <div className="flex flex-col items-center py-12 gap-6">
-                <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center">
-                  <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />
+              <div className="flex flex-col items-center py-12 gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                  <Loader2 className="w-6 h-6 text-blue-400 animate-spin" />
                 </div>
                 <div className="text-center">
-                  <p className="text-white font-medium text-lg mb-1">
+                  <p className="text-white font-medium text-[15px] mb-1">
                     {PROGRESS_MESSAGES[progressIndex]}
                   </p>
-                  <p className="text-slate-400 text-sm">
-                    Analysing {conversations?.length} conversations with Claude
+                  <p className="text-white/35 text-sm">
+                    {conversations?.length} conversations · Claude AI
                   </p>
                 </div>
-                <div className="w-full max-w-xs bg-slate-700 rounded-full h-1.5">
+                <div className="w-full max-w-[200px] bg-white/[0.08] rounded-full h-[3px]">
                   <div
-                    className="bg-blue-500 h-1.5 rounded-full transition-all duration-700"
+                    className="bg-blue-500 h-[3px] rounded-full transition-all duration-700"
                     style={{
                       width: `${((progressIndex + 1) / PROGRESS_MESSAGES.length) * 100}%`,
                     }}
                   />
-                </div>
-                <div className="flex gap-1.5">
-                  {PROGRESS_MESSAGES.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-1.5 h-1.5 rounded-full transition-colors duration-300 ${
-                        i <= progressIndex ? 'bg-blue-400' : 'bg-slate-600'
-                      }`}
-                    />
-                  ))}
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        <p className="text-center text-slate-600 text-xs mt-10">
+        <p className="text-center text-white/15 text-xs mt-8">
           No data is stored. Conversations are analysed in-memory and discarded after the session.
         </p>
       </div>

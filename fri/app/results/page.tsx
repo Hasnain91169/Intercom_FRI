@@ -54,19 +54,19 @@ function MetricCard({
   variant?: 'default' | 'blue' | 'amber' | 'red'
 }) {
   const colors = {
-    default: 'text-slate-300',
+    default: 'text-white/80',
     blue: 'text-blue-400',
     amber: 'text-amber-400',
     red: 'text-red-400',
   }
   return (
-    <div className="p-5 rounded-xl bg-slate-800/50 border border-slate-700/50">
-      <p className="text-slate-400 text-sm mb-1">{label}</p>
+    <div className="p-5 rounded-xl bg-white/[0.03] border border-white/[0.07] hover:bg-white/[0.05] transition-colors">
+      <p className="text-white/40 text-xs font-medium uppercase tracking-wide mb-2">{label}</p>
       <div className="flex items-baseline gap-1">
         <span className={`text-3xl font-bold ${colors[variant]}`}>{value}</span>
         {suffix && <span className={`text-lg ${colors[variant]}`}>{suffix}</span>}
       </div>
-      {subtext && <p className="text-slate-500 text-xs mt-1">{subtext}</p>}
+      {subtext && <p className="text-white/25 text-xs mt-1">{subtext}</p>}
     </div>
   )
 }
@@ -76,23 +76,23 @@ function ConversationRow({ conv, index }: { conv: ClassifiedConversation; index:
   return (
     <>
       <tr
-        className={`border-b border-slate-700/50 hover:bg-slate-700/20 cursor-pointer transition-colors ${
-          index % 2 === 0 ? '' : 'bg-slate-800/20'
+        className={`border-b border-white/[0.05] hover:bg-white/[0.03] cursor-pointer transition-colors ${
+          index % 2 === 0 ? '' : 'bg-white/[0.015]'
         }`}
         onClick={() => setExpanded(!expanded)}
       >
         <td className="px-4 py-3">
-          <p className="text-white text-sm truncate max-w-xs">{conv.customerMessage}</p>
+          <p className="text-white/80 text-sm truncate max-w-xs">{conv.customerMessage}</p>
         </td>
         <td className="px-4 py-3">
-          <p className="text-slate-400 text-sm truncate max-w-xs">{conv.finResponse}</p>
+          <p className="text-white/35 text-sm truncate max-w-xs">{conv.finResponse}</p>
         </td>
         <td className="px-4 py-3 text-center">
           <span
             className={`text-xs font-medium px-2 py-0.5 rounded-full ${
               conv.genuinelyResolved
-                ? 'bg-green-500/20 text-green-400'
-                : 'bg-red-500/20 text-red-400'
+                ? 'bg-green-500/15 text-green-400'
+                : 'bg-red-500/15 text-red-400'
             }`}
           >
             {conv.genuinelyResolved ? 'Yes' : 'No'}
@@ -104,34 +104,34 @@ function ConversationRow({ conv, index }: { conv: ClassifiedConversation; index:
           </span>
         </td>
         <td className="px-4 py-3 text-center">
-          <span className="text-slate-300 text-sm">{conv.confidenceScore}%</span>
+          <span className="text-white/50 text-sm">{conv.confidenceScore}%</span>
         </td>
         <td className="px-4 py-3">
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-slate-400" />
+            <ChevronUp className="w-4 h-4 text-white/25" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-slate-400" />
+            <ChevronDown className="w-4 h-4 text-white/25" />
           )}
         </td>
       </tr>
       {expanded && (
-        <tr className="border-b border-slate-700/50 bg-slate-800/40">
-          <td colSpan={6} className="px-4 py-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm">
+        <tr className="border-b border-white/[0.05] bg-white/[0.025]">
+          <td colSpan={6} className="px-4 py-5">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 text-sm">
               <div>
-                <p className="text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Customer Message</p>
-                <p className="text-white leading-relaxed">{conv.customerMessage}</p>
+                <p className="text-white/30 text-xs font-medium uppercase tracking-wide mb-2">Customer Message</p>
+                <p className="text-white/80 leading-relaxed">{conv.customerMessage}</p>
               </div>
               <div>
-                <p className="text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">Fin Response</p>
-                <p className="text-slate-300 leading-relaxed">{conv.finResponse}</p>
+                <p className="text-white/30 text-xs font-medium uppercase tracking-wide mb-2">Fin Response</p>
+                <p className="text-white/50 leading-relaxed">{conv.finResponse}</p>
               </div>
               <div>
-                <p className="text-slate-400 text-xs font-medium uppercase tracking-wide mb-1">FRI Analysis</p>
-                <p className="text-slate-300 leading-relaxed mb-2">{conv.explanation}</p>
-                <div className="p-2 rounded bg-blue-500/10 border border-blue-500/20">
-                  <p className="text-blue-400 text-xs font-medium">Recommended fix</p>
-                  <p className="text-slate-300 text-xs mt-0.5">{conv.recommendedFix}</p>
+                <p className="text-white/30 text-xs font-medium uppercase tracking-wide mb-2">FRI Analysis</p>
+                <p className="text-white/60 leading-relaxed mb-3">{conv.explanation}</p>
+                <div className="p-3 rounded-lg bg-blue-500/[0.08] border border-blue-500/15">
+                  <p className="text-blue-400 text-xs font-medium mb-1">Recommended fix</p>
+                  <p className="text-white/50 text-xs leading-relaxed">{conv.recommendedFix}</p>
                 </div>
               </div>
             </div>
@@ -162,8 +162,8 @@ export default function ResultsPage() {
 
   if (!result) {
     return (
-      <div className="min-h-screen bg-[#0F172A] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen bg-[#06090E] flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
@@ -312,37 +312,39 @@ export default function ResultsPage() {
   const missingPrimitiveCount = result.failureBreakdown.missing_primitive ?? 0
 
   return (
-    <div className="min-h-screen bg-[#0F172A] text-white">
-      {/* Top bar */}
-      <header className="border-b border-slate-800 px-6 py-4 sticky top-0 bg-[#0F172A]/95 backdrop-blur z-10">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+    <div className="min-h-screen bg-[#06090E] text-white">
+      {/* Top bar — Intercom-style sticky nav */}
+      <header className="border-b border-white/[0.06] px-6 sticky top-0 bg-[#06090E]/90 backdrop-blur-md z-10">
+        <div className="max-w-7xl mx-auto h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
               onClick={() => router.push('/')}
-              className="flex items-center gap-1.5 text-slate-400 hover:text-white transition-colors text-sm"
+              className="flex items-center gap-1.5 text-white/40 hover:text-white/80 transition-colors text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
               New analysis
             </button>
-            <div className="w-px h-4 bg-slate-700" />
+            <div className="w-px h-4 bg-white/[0.08]" />
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-blue-400" />
-              <span className="font-semibold">FRI Analysis Report</span>
+              <div className="w-5 h-5 rounded bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center">
+                <BarChart3 className="w-2.5 h-2.5 text-white" />
+              </div>
+              <span className="font-semibold text-[15px]">FRI Analysis Report</span>
             </div>
             {isDemo && (
-              <span className="px-2 py-0.5 rounded text-xs bg-blue-500/20 text-blue-400 border border-blue-500/30 font-medium">
-                DEMO MODE
+              <span className="px-1.5 py-0.5 rounded text-[11px] bg-blue-500/15 text-blue-400 border border-blue-500/25 font-medium">
+                DEMO
               </span>
             )}
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-slate-400 text-sm">{result.totalConversations} conversations analysed</span>
+            <span className="text-white/30 text-sm">{result.totalConversations} conversations</span>
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white border border-slate-700 px-3 py-1.5 rounded-lg transition-colors"
+              className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 border border-white/[0.08] hover:border-white/[0.14] px-3 py-1.5 rounded-lg transition-all duration-150"
             >
               <Download className="w-3.5 h-3.5" />
-              Download report
+              Download
             </button>
           </div>
         </div>
@@ -441,19 +443,19 @@ export default function ResultsPage() {
         )}
 
         {/* Conversation table */}
-        <div className="rounded-xl bg-slate-800/50 border border-slate-700/50 overflow-hidden">
-          <div className="px-6 py-4 border-b border-slate-700/50 flex items-center justify-between">
+        <div className="rounded-xl bg-white/[0.025] border border-white/[0.07] overflow-hidden">
+          <div className="px-6 py-4 border-b border-white/[0.06] flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-white">Classified Conversations</h3>
-              <p className="text-slate-400 text-sm mt-0.5">
+              <h3 className="font-semibold text-white text-[15px]">Classified Conversations</h3>
+              <p className="text-white/35 text-sm mt-0.5">
                 {filteredConversations.length} conversation{filteredConversations.length !== 1 ? 's' : ''}
-                {activeCategory && ` filtered by: ${FAILURE_LABELS[activeCategory]}`}
+                {activeCategory && ` · filtered by ${FAILURE_LABELS[activeCategory]}`}
               </p>
             </div>
             {activeCategory && (
               <button
                 onClick={() => handleCategoryFilter(null)}
-                className="text-xs text-slate-400 hover:text-white border border-slate-600 px-2 py-1 rounded transition-colors"
+                className="text-xs text-white/40 hover:text-white/70 border border-white/[0.08] hover:border-white/[0.14] px-2.5 py-1 rounded-lg transition-all duration-150"
               >
                 Clear filter
               </button>
@@ -463,12 +465,12 @@ export default function ResultsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-slate-700/50">
-                  <th className="px-4 py-3 text-left text-slate-400 text-xs font-medium uppercase tracking-wide">Customer Message</th>
-                  <th className="px-4 py-3 text-left text-slate-400 text-xs font-medium uppercase tracking-wide">Fin Response</th>
-                  <th className="px-4 py-3 text-center text-slate-400 text-xs font-medium uppercase tracking-wide">Genuine?</th>
-                  <th className="px-4 py-3 text-left text-slate-400 text-xs font-medium uppercase tracking-wide">Category</th>
-                  <th className="px-4 py-3 text-center text-slate-400 text-xs font-medium uppercase tracking-wide">Confidence</th>
+                <tr className="border-b border-white/[0.06]">
+                  <th className="px-4 py-3 text-left text-white/30 text-xs font-medium uppercase tracking-wide">Customer Message</th>
+                  <th className="px-4 py-3 text-left text-white/30 text-xs font-medium uppercase tracking-wide">Fin Response</th>
+                  <th className="px-4 py-3 text-center text-white/30 text-xs font-medium uppercase tracking-wide">Genuine?</th>
+                  <th className="px-4 py-3 text-left text-white/30 text-xs font-medium uppercase tracking-wide">Category</th>
+                  <th className="px-4 py-3 text-center text-white/30 text-xs font-medium uppercase tracking-wide">Confidence</th>
                   <th className="px-4 py-3 w-8" />
                 </tr>
               </thead>
@@ -481,20 +483,20 @@ export default function ResultsPage() {
           </div>
 
           {totalPages > 1 && (
-            <div className="px-6 py-4 border-t border-slate-700/50 flex items-center justify-between">
-              <p className="text-slate-400 text-sm">Page {page} of {totalPages}</p>
+            <div className="px-6 py-4 border-t border-white/[0.06] flex items-center justify-between">
+              <p className="text-white/30 text-sm">Page {page} of {totalPages}</p>
               <div className="flex gap-2">
                 <button
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="px-3 py-1.5 rounded-lg border border-slate-600 text-slate-400 text-sm disabled:opacity-40 hover:text-white hover:border-slate-500 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 text-sm disabled:opacity-30 hover:text-white/70 hover:border-white/[0.14] transition-all duration-150"
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                   disabled={page === totalPages}
-                  className="px-3 py-1.5 rounded-lg border border-slate-600 text-slate-400 text-sm disabled:opacity-40 hover:text-white hover:border-slate-500 transition-colors"
+                  className="px-3 py-1.5 rounded-lg border border-white/[0.08] text-white/40 text-sm disabled:opacity-30 hover:text-white/70 hover:border-white/[0.14] transition-all duration-150"
                 >
                   Next
                 </button>
@@ -504,10 +506,10 @@ export default function ResultsPage() {
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between py-4 text-slate-600 text-xs">
+        <div className="flex items-center justify-between py-4 text-white/15 text-xs">
           <span>FRI · Fin Resolution Intelligence</span>
           <div className="flex items-center gap-1">
-            <span>0-to-1 deployment diagnostic tool</span>
+            <span>0-to-1 deployment diagnostic</span>
             <ExternalLink className="w-3 h-3" />
           </div>
         </div>

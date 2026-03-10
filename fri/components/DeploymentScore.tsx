@@ -20,11 +20,11 @@ export default function DeploymentScore({ score, genuineResolutionRate, kbHealth
   const strokeDashoffset = circumference - (score / 100) * circumference
 
   return (
-    <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700/50 flex items-center gap-8">
+    <div className="p-6 rounded-xl bg-white/[0.03] border border-white/[0.07] flex items-center gap-8">
       {/* Score ring */}
       <div className="relative w-32 h-32 shrink-0">
         <svg className="w-32 h-32 -rotate-90" viewBox="0 0 120 120">
-          <circle cx="60" cy="60" r="52" fill="none" stroke="#1E293B" strokeWidth="10" />
+          <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="10" />
           <circle
             cx="60"
             cy="60"
@@ -54,23 +54,23 @@ export default function DeploymentScore({ score, genuineResolutionRate, kbHealth
           </div>
         </div>
 
-        <p className="text-slate-400 text-sm mt-3 leading-relaxed">
+        <p className="text-white/40 text-sm mt-3 leading-relaxed">
           A composite of resolution quality, KB health, and primitive coverage. This is the number an FDE would use to benchmark a deployment at onboarding.
         </p>
 
         {/* Sub-scores */}
         <div className="flex gap-6 mt-4">
           <div>
-            <p className="text-slate-500 text-xs">Genuine resolution</p>
-            <p className="text-white font-semibold">{genuineResolutionRate}%</p>
+            <p className="text-white/25 text-xs">Genuine resolution</p>
+            <p className="text-white/80 font-semibold">{genuineResolutionRate}%</p>
           </div>
           <div>
-            <p className="text-slate-500 text-xs">KB health</p>
-            <p className="text-white font-semibold">{kbHealthScore}/100</p>
+            <p className="text-white/25 text-xs">KB health</p>
+            <p className="text-white/80 font-semibold">{kbHealthScore}/100</p>
           </div>
           <div>
-            <p className="text-slate-500 text-xs">Score trend</p>
-            <p className="text-slate-400 font-semibold">Baseline</p>
+            <p className="text-white/25 text-xs">Score trend</p>
+            <p className="text-white/30 font-semibold">Baseline</p>
           </div>
         </div>
       </div>

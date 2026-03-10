@@ -18,18 +18,18 @@ const CATEGORY_LABELS: Record<FailureCategory, string> = {
 }
 
 const CATEGORY_COLORS: Record<FailureCategory, string> = {
-  knowledge_gap: 'bg-red-500/20 text-red-400 border-red-500/30',
-  missing_primitive: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  ambiguous_query: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  instruction_conflict: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
-  out_of_scope: 'bg-slate-500/20 text-slate-400 border-slate-500/30',
-  genuine_resolution: 'bg-green-500/20 text-green-400 border-green-500/30',
+  knowledge_gap: 'bg-red-500/[0.12] text-red-400 border-red-500/20',
+  missing_primitive: 'bg-violet-500/[0.12] text-violet-400 border-violet-500/20',
+  ambiguous_query: 'bg-amber-500/[0.12] text-amber-400 border-amber-500/20',
+  instruction_conflict: 'bg-orange-500/[0.12] text-orange-400 border-orange-500/20',
+  out_of_scope: 'bg-white/[0.06] text-white/40 border-white/10',
+  genuine_resolution: 'bg-green-500/[0.12] text-green-400 border-green-500/20',
 }
 
 const EFFORT_COLORS = {
-  low: 'bg-green-500/20 text-green-400',
-  medium: 'bg-amber-500/20 text-amber-400',
-  high: 'bg-red-500/20 text-red-400',
+  low: 'bg-green-500/[0.1] text-green-400',
+  medium: 'bg-amber-500/[0.1] text-amber-400',
+  high: 'bg-red-500/[0.1] text-red-400',
 }
 
 export default function FixPlaybook({ items }: FixPlaybookProps) {
@@ -49,17 +49,17 @@ export default function FixPlaybook({ items }: FixPlaybookProps) {
   }
 
   return (
-    <div className="p-6 rounded-xl bg-slate-800/50 border border-slate-700/50">
+    <div className="p-6 rounded-xl bg-white/[0.025] border border-white/[0.07]">
       <div className="flex items-start justify-between mb-2">
         <div>
-          <h3 className="font-semibold text-white mb-1">Fix Playbook</h3>
-          <p className="text-slate-400 text-sm">
+          <h3 className="font-semibold text-white text-[15px] mb-1">Fix Playbook</h3>
+          <p className="text-white/35 text-sm">
             Accelerate time to value — prioritised actions to improve genuine resolution rate
           </p>
         </div>
         <button
           onClick={handleCopy}
-          className="flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition-colors border border-slate-600 px-3 py-1.5 rounded-lg shrink-0"
+          className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors border border-white/[0.08] hover:border-white/[0.14] px-3 py-1.5 rounded-lg shrink-0"
         >
           {copied ? (
             <>
@@ -81,8 +81,8 @@ export default function FixPlaybook({ items }: FixPlaybookProps) {
             key={index}
             className={`rounded-xl border transition-all duration-200 ${
               expanded === index
-                ? 'bg-slate-700/60 border-slate-600'
-                : 'bg-slate-800/40 border-slate-700/50 hover:border-slate-600/80'
+                ? 'bg-white/[0.05] border-white/[0.12]'
+                : 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.1]'
             }`}
           >
             <button
@@ -92,12 +92,12 @@ export default function FixPlaybook({ items }: FixPlaybookProps) {
               <div className="flex items-start gap-3">
                 {/* Priority number */}
                 <div
-                  className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5 ${
                     item.priority === 1
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-blue-500/80 text-white'
                       : item.priority === 2
-                      ? 'bg-slate-600 text-slate-300'
-                      : 'bg-slate-700 text-slate-400'
+                      ? 'bg-white/[0.08] text-white/50'
+                      : 'bg-white/[0.05] text-white/30'
                   }`}
                 >
                   {index + 1}
@@ -118,10 +118,10 @@ export default function FixPlaybook({ items }: FixPlaybookProps) {
                     </span>
                   </div>
 
-                  <p className="text-white text-sm font-medium leading-snug">{item.action}</p>
+                  <p className="text-white/80 text-sm font-medium leading-snug">{item.action}</p>
 
                   <div className="flex items-center gap-1.5 mt-2">
-                    <span className="text-green-400 text-xs font-semibold">{item.estimatedImpact}</span>
+                    <span className="text-green-400/80 text-xs font-semibold">{item.estimatedImpact}</span>
                   </div>
                 </div>
               </div>
@@ -129,17 +129,17 @@ export default function FixPlaybook({ items }: FixPlaybookProps) {
 
             {expanded === index && (
               <div className="px-4 pb-4 space-y-3">
-                <div className="ml-10 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50">
-                  <p className="text-slate-300 text-sm leading-relaxed">{item.detail}</p>
+                <div className="ml-9 p-3 rounded-lg bg-white/[0.03] border border-white/[0.07]">
+                  <p className="text-white/55 text-sm leading-relaxed">{item.detail}</p>
                 </div>
                 {item.implementationSketch && (
-                  <div className="ml-10 p-3 rounded-lg bg-slate-900/60 border border-purple-500/20">
+                  <div className="ml-9 p-3 rounded-lg bg-black/30 border border-violet-500/15">
                     <div className="flex items-center gap-1.5 mb-2">
-                      <Terminal className="w-3.5 h-3.5 text-purple-400" />
-                      <span className="text-purple-400 text-xs font-medium uppercase tracking-wide">Implementation sketch</span>
-                      <span className="text-slate-600 text-xs ml-1">· what I&apos;d prototype with the customer&apos;s team</span>
+                      <Terminal className="w-3.5 h-3.5 text-violet-400" />
+                      <span className="text-violet-400/80 text-xs font-medium uppercase tracking-wide">Implementation sketch</span>
+                      <span className="text-white/20 text-xs ml-1">· what I&apos;d prototype with the customer&apos;s team</span>
                     </div>
-                    <p className="text-slate-300 text-xs font-mono leading-relaxed whitespace-pre-wrap">{item.implementationSketch}</p>
+                    <p className="text-white/50 text-xs font-mono leading-relaxed whitespace-pre-wrap">{item.implementationSketch}</p>
                   </div>
                 )}
               </div>
