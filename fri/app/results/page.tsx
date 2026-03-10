@@ -188,26 +188,117 @@ export default function ResultsPage() {
   }
 
   const handleDownload = () => {
-    const report = {
-      generatedAt: new Date().toISOString(),
-      deploymentScore: result.deploymentScore,
-      summary: {
-        totalConversations: result.totalConversations,
-        reportedResolutionRate: `${result.reportedResolutionRate}%`,
-        genuineResolutionRate: `${result.genuineResolutionRate}%`,
-        assumedResolutionCount: result.assumedResolutionCount,
-        estimatedWastedSpend: `£${result.estimatedWastedSpend.toFixed(2)}`,
-        kbHealthScore: result.kbHealthScore,
-      },
-      failureBreakdown: result.failureBreakdown,
-      roadmapSignal: result.roadmapSignal,
-      fixPlaybook: result.fixPlaybook,
+    const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+    const effortLabel = { low: 'Low', medium: 'Medium', high: 'High' }
+    const categoryLabel: Record<string, string> = {
+      knowledge_gap: 'Knowledge Gap',
+      missing_primitive: 'Missing Primitive',
+      ambiguous_query: 'Ambiguous Query',
+      instruction_conflict: 'Instruction Conflict',
+      out_of_scope: 'Out of Scope',
+      genuine_resolution: 'Genuine Resolution',
     }
-    const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' })
+
+    const lines: string[] = [
+      'FIN RESOLUTION INTELLIGENCE — ANALYSIS REPORT',
+      '='.repeat(54),
+      `Generated: ${date}`,
+      `Conversations analysed: ${result.totalConversations}`,
+      '',
+      '━'.repeat(54),
+      'DEPLOYMENT SCORE',
+      '━'.repeat(54),
+      `Score: ${result.deploymentScore}/100`,
+      '',
+      '━'.repeat(54),
+      'RESOLUTION QUALITY',
+      '━'.repeat(54),
+      `Reported resolution rate:  ${result.reportedResolutionRate}%   (as claimed by Fin)`,
+      `Genuine resolution rate:   ${result.genuineResolutionRate}%   (as verified by FRI)`,
+      `Assumed resolutions:       ${result.assumedResolutionCount}   (paid for, not genuinely resolved)`,
+      `Estimated wasted spend:    £${result.estimatedWastedSpend.toFixed(2)}`,
+      `Estimated monthly cost:    £${result.estimatedMonthlyCost.toFixed(2)}`,
+      '',
+      '━'.repeat(54),
+      'FAILURE BREAKDOWN',
+      '━'.repeat(54),
+      ...Object.entries(result.failureBreakdown)
+        .filter(([, n]) => n > 0)
+        .sort(([, a], [, b]) => b - a)
+        .map(([cat, n]) => `${categoryLabel[cat] ?? cat}:  ${n} conversation${n !== 1 ? 's' : ''}`),
+      '',
+      '━'.repeat(54),
+      'KNOWLEDGE BASE HEALTH',
+      '━'.repeat(54),
+      `Overall score:  ${result.kbHealthScore}/100`,
+      `Coverage:       ${result.kbCoverageScore}/100`,
+      `Freshness:      ${result.kbFreshnessScore}/100`,
+      `Clarity:        ${result.kbClarityScore}/100`,
+      '',
+    ]
+
+    if (result.roadmapSignal?.missingPrimitiveCount > 0) {
+      lines.push(
+        '━'.repeat(54),
+        'ROADMAP SIGNAL — MISSING PRIMITIVES',
+        '━'.repeat(54),
+        result.roadmapSignal.prioritySummary,
+        `Estimated recovery if built: ${result.roadmapSignal.estimatedResolutionRecovery}`,
+        '',
+        ...result.roadmapSignal.topPrimitives.flatMap((p, i) => [
+          `${i + 1}. ${p.name}`,
+          `   Frequency:      ${p.frequency} conversation${p.frequency !== 1 ? 's' : ''}`,
+          `   Build estimate: ${p.estimatedBuildDays}`,
+          `   API dependency: ${p.apiDependency}`,
+          `   Customer impact: ${p.customerImpact}`,
+          `   Product input:   ${p.productInput}`,
+          '',
+        ]),
+      )
+    }
+
+    lines.push(
+      '━'.repeat(54),
+      'FIX PLAYBOOK',
+      '━'.repeat(54),
+      '',
+      ...result.fixPlaybook.flatMap((item, i) => {
+        const block = [
+          `${i + 1}. [Priority ${item.priority}] [${categoryLabel[item.category] ?? item.category}] [${effortLabel[item.effort]} effort]`,
+          `   ${item.action}`,
+          `   Impact: ${item.estimatedImpact}`,
+          `   ${item.detail}`,
+        ]
+        if (item.implementationSketch) {
+          block.push(`   Implementation sketch: ${item.implementationSketch}`)
+        }
+        block.push('')
+        return block
+      }),
+      '━'.repeat(54),
+      'CLASSIFIED CONVERSATIONS',
+      '━'.repeat(54),
+      '',
+      ...result.classifiedConversations.flatMap((c) => [
+        `ID: ${c.id}`,
+        `Customer: ${c.customerMessage}`,
+        `Fin:      ${c.finResponse}`,
+        `Genuine:  ${c.genuinelyResolved ? 'Yes' : 'No'}   Category: ${categoryLabel[c.failureCategory] ?? c.failureCategory}   Confidence: ${c.confidenceScore}%`,
+        `Analysis: ${c.explanation}`,
+        `Fix:      ${c.recommendedFix}`,
+        '',
+      ]),
+      '━'.repeat(54),
+      'FRI · Fin Resolution Intelligence · 0-to-1 deployment diagnostic',
+      '━'.repeat(54),
+    )
+
+    const text = lines.join('\n')
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `fri-report-${new Date().toISOString().split('T')[0]}.json`
+    a.download = `fri-report-${new Date().toISOString().split('T')[0]}.txt`
     a.click()
     URL.revokeObjectURL(url)
   }
