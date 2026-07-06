@@ -30,7 +30,7 @@ export default function ResolutionScoreCard({
       <h3 className="font-semibold text-white text-[15px] mb-1">Resolution Quality Split</h3>
       <p className="text-white/40 text-sm mb-6">
         Fin reported <span className="text-white/80 font-medium">{reportedResolutionRate}%</span> resolved.
-        FRI found <span className="text-blue-400 font-medium">{genuineResolutionRate}%</span> genuinely resolved.
+        Claude assessed <span className="text-blue-400 font-medium">{genuineResolutionRate}%</span> as genuinely resolved.
       </p>
 
       <div className="flex items-center gap-6">

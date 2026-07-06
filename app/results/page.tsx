@@ -9,6 +9,7 @@ import {
   ChevronDown,
   ChevronUp,
   ExternalLink,
+  Loader2,
 } from 'lucide-react'
 import { AnalysisResult, ClassifiedConversation, FailureCategory } from '@/lib/types'
 import ResolutionScoreCard from '@/components/ResolutionScoreCard'
@@ -148,7 +149,9 @@ export default function ResultsPage() {
   const [isDemo, setIsDemo] = useState(false)
   const [activeCategory, setActiveCategory] = useState<FailureCategory | null>(null)
   const [page, setPage] = useState(1)
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false)
   const roadmapRef = useRef<HTMLDivElement>(null)
+  const reportContentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const stored = sessionStorage.getItem('fri_result')
@@ -187,120 +190,68 @@ export default function ResultsPage() {
     roadmapRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  const handleDownload = () => {
-    const date = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
-    const effortLabel = { low: 'Low', medium: 'Medium', high: 'High' }
-    const categoryLabel: Record<string, string> = {
-      knowledge_gap: 'Knowledge Gap',
-      missing_primitive: 'Missing Primitive',
-      ambiguous_query: 'Ambiguous Query',
-      instruction_conflict: 'Instruction Conflict',
-      out_of_scope: 'Out of Scope',
-      genuine_resolution: 'Genuine Resolution',
+  const handleDownload = async () => {
+    if (!reportContentRef.current || isGeneratingPDF) return
+    setIsGeneratingPDF(true)
+
+    try {
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import('jspdf'),
+        import('html2canvas'),
+      ])
+
+      const content = reportContentRef.current
+
+      // Expand all collapsed conversation rows by temporarily showing full content
+      const canvas = await html2canvas(content, {
+        scale: 1.5,
+        useCORS: true,
+        backgroundColor: '#06090E',
+        logging: false,
+        windowWidth: 1280,
+        scrollX: 0,
+        scrollY: 0,
+      })
+
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+      const pageW = pdf.internal.pageSize.getWidth()
+      const pageH = pdf.internal.pageSize.getHeight()
+
+      const imgW = canvas.width
+      const imgH = canvas.height
+      const ratio = pageW / imgW
+
+      // Slice tall canvas into A4 pages
+      const pageCanvas = document.createElement('canvas')
+      pageCanvas.width = imgW
+      const sliceH = Math.floor(pageH / ratio) // pixels per page slice
+
+      let offsetY = 0
+      let pageNum = 0
+
+      while (offsetY < imgH) {
+        const sliceActual = Math.min(sliceH, imgH - offsetY)
+        pageCanvas.height = sliceActual
+
+        const ctx = pageCanvas.getContext('2d')!
+        ctx.drawImage(canvas, 0, offsetY, imgW, sliceActual, 0, 0, imgW, sliceActual)
+
+        const sliceData = pageCanvas.toDataURL('image/jpeg', 0.92)
+        const sliceScaledH = sliceActual * ratio
+
+        if (pageNum > 0) pdf.addPage()
+        pdf.addImage(sliceData, 'JPEG', 0, 0, pageW, sliceScaledH)
+
+        offsetY += sliceActual
+        pageNum++
+      }
+
+      // Add a clean cover header on page 1
+      pdf.setPage(1)
+      pdf.save(`fri-report-${new Date().toISOString().split('T')[0]}.pdf`)
+    } finally {
+      setIsGeneratingPDF(false)
     }
-
-    const lines: string[] = [
-      'FIN RESOLUTION INTELLIGENCE — ANALYSIS REPORT',
-      '='.repeat(54),
-      `Generated: ${date}`,
-      `Conversations analysed: ${result.totalConversations}`,
-      '',
-      '━'.repeat(54),
-      'DEPLOYMENT SCORE',
-      '━'.repeat(54),
-      `Score: ${result.deploymentScore}/100`,
-      '',
-      '━'.repeat(54),
-      'RESOLUTION QUALITY',
-      '━'.repeat(54),
-      `Reported resolution rate:  ${result.reportedResolutionRate}%   (as claimed by Fin)`,
-      `Genuine resolution rate:   ${result.genuineResolutionRate}%   (as verified by FRI)`,
-      `Assumed resolutions:       ${result.assumedResolutionCount}   (paid for, not genuinely resolved)`,
-      `Estimated wasted spend:    £${result.estimatedWastedSpend.toFixed(2)}`,
-      `Estimated monthly cost:    £${result.estimatedMonthlyCost.toFixed(2)}`,
-      '',
-      '━'.repeat(54),
-      'FAILURE BREAKDOWN',
-      '━'.repeat(54),
-      ...Object.entries(result.failureBreakdown)
-        .filter(([, n]) => n > 0)
-        .sort(([, a], [, b]) => b - a)
-        .map(([cat, n]) => `${categoryLabel[cat] ?? cat}:  ${n} conversation${n !== 1 ? 's' : ''}`),
-      '',
-      '━'.repeat(54),
-      'KNOWLEDGE BASE HEALTH',
-      '━'.repeat(54),
-      `Overall score:  ${result.kbHealthScore}/100`,
-      `Coverage:       ${result.kbCoverageScore}/100`,
-      `Freshness:      ${result.kbFreshnessScore}/100`,
-      `Clarity:        ${result.kbClarityScore}/100`,
-      '',
-    ]
-
-    if (result.roadmapSignal?.missingPrimitiveCount > 0) {
-      lines.push(
-        '━'.repeat(54),
-        'ROADMAP SIGNAL — MISSING PRIMITIVES',
-        '━'.repeat(54),
-        result.roadmapSignal.prioritySummary,
-        `Estimated recovery if built: ${result.roadmapSignal.estimatedResolutionRecovery}`,
-        '',
-        ...result.roadmapSignal.topPrimitives.flatMap((p, i) => [
-          `${i + 1}. ${p.name}`,
-          `   Frequency:      ${p.frequency} conversation${p.frequency !== 1 ? 's' : ''}`,
-          `   Build estimate: ${p.estimatedBuildDays}`,
-          `   API dependency: ${p.apiDependency}`,
-          `   Customer impact: ${p.customerImpact}`,
-          `   Product input:   ${p.productInput}`,
-          '',
-        ]),
-      )
-    }
-
-    lines.push(
-      '━'.repeat(54),
-      'FIX PLAYBOOK',
-      '━'.repeat(54),
-      '',
-      ...result.fixPlaybook.flatMap((item, i) => {
-        const block = [
-          `${i + 1}. [Priority ${item.priority}] [${categoryLabel[item.category] ?? item.category}] [${effortLabel[item.effort]} effort]`,
-          `   ${item.action}`,
-          `   Impact: ${item.estimatedImpact}`,
-          `   ${item.detail}`,
-        ]
-        if (item.implementationSketch) {
-          block.push(`   Implementation sketch: ${item.implementationSketch}`)
-        }
-        block.push('')
-        return block
-      }),
-      '━'.repeat(54),
-      'CLASSIFIED CONVERSATIONS',
-      '━'.repeat(54),
-      '',
-      ...result.classifiedConversations.flatMap((c) => [
-        `ID: ${c.id}`,
-        `Customer: ${c.customerMessage}`,
-        `Fin:      ${c.finResponse}`,
-        `Genuine:  ${c.genuinelyResolved ? 'Yes' : 'No'}   Category: ${categoryLabel[c.failureCategory] ?? c.failureCategory}   Confidence: ${c.confidenceScore}%`,
-        `Analysis: ${c.explanation}`,
-        `Fix:      ${c.recommendedFix}`,
-        '',
-      ]),
-      '━'.repeat(54),
-      'FRI · Fin Resolution Intelligence · 0-to-1 deployment diagnostic',
-      '━'.repeat(54),
-    )
-
-    const text = lines.join('\n')
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `fri-report-${new Date().toISOString().split('T')[0]}.txt`
-    a.click()
-    URL.revokeObjectURL(url)
   }
 
   const wastedSpendFormatted = new Intl.NumberFormat('en-GB', {
@@ -341,16 +292,26 @@ export default function ResultsPage() {
             <span className="text-white/30 text-sm">{result.totalConversations} conversations</span>
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 border border-white/[0.08] hover:border-white/[0.14] px-3 py-1.5 rounded-lg transition-all duration-150"
+              disabled={isGeneratingPDF}
+              className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white/80 border border-white/[0.08] hover:border-white/[0.14] px-3 py-1.5 rounded-lg transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Download className="w-3.5 h-3.5" />
-              Download
+              {isGeneratingPDF ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  Generating PDF…
+                </>
+              ) : (
+                <>
+                  <Download className="w-3.5 h-3.5" />
+                  Download PDF
+                </>
+              )}
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
+      <div ref={reportContentRef} className="max-w-7xl mx-auto px-6 py-8 space-y-6">
 
         {/* Deployment Score — the single number at a glance */}
         <DeploymentScore
@@ -372,7 +333,7 @@ export default function ResultsPage() {
             label="Genuine Resolution Rate"
             value={result.genuineResolutionRate}
             suffix="%"
-            subtext="As verified by FRI"
+            subtext="Claude-graded — no labelled ground truth"
             variant="blue"
           />
           <MetricCard

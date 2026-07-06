@@ -72,7 +72,7 @@ export default function KBHealthPanel({
         <div>
           <h3 className="font-semibold text-white text-[15px] mb-1">Knowledge Base Health</h3>
           <p className="text-white/40 text-sm">
-            Product shape assessment — based on Fin&apos;s response quality
+            Claude-assessed from Fin&apos;s response quality — no labelled ground truth
           </p>
         </div>
         <div className="text-right">

@@ -16,7 +16,7 @@ FRI reads your conversation export, runs it through a 4-pass Claude analysis, an
 - Every failure categorised (KB gap, missing primitive, ambiguous query, instruction conflict, out-of-scope)
 - A knowledge base health score
 - A prioritised fix playbook with implementation sketches
-- A deployment score (0–100) with a letter grade
+- A deployment score (0–100) with a letter grade (heuristic weighting — see [How to read the numbers](#how-to-read-the-numbers))
 - Product signal for missing Fin primitives, structured as R&D feedback
 
 ---
@@ -24,14 +24,13 @@ FRI reads your conversation export, runs it through a 4-pass Claude analysis, an
 ## Running locally
 
 ```bash
-cd fri
 npm install
 ```
 
-Create `fri/.env.local`:
+Create `.env.local` (copy `.env.example` and paste your real key):
 
 ```
-ANTHROPIC_API_KEY=your_key_here
+ANTHROPIC_API_KEY=your-key-here
 ```
 
 ```bash
@@ -74,6 +73,16 @@ Passes 3 and 4 run in parallel once pass 2 completes.
 
 ---
 
+## How to read the numbers
+
+Be honest about what these metrics are and aren't:
+
+- **Every quality metric is Claude-graded, with no labelled ground truth.** The genuine-vs-assumed resolution split, confidence scores, and KB health scores are all Claude's own judgement of Claude-adjacent output. Nothing here is validated against a human-labelled dataset, so treat them as *LLM-assessed signals*, not measured accuracy.
+- **The deployment score is an uncalibrated heuristic.** It is a fixed-weight formula (`genuineRate·0.5 + kbHealth·0.3 + 20 − missingPrimitive%·25 − conflict%·20`, clamped to 0–100). The weights were chosen by hand, not fitted to outcomes — the letter grade is a directional summary, not a benchmark.
+- **ROI figures are illustrative.** They assume the sample volume scales monthly, a flat $0.99/conversation, ~70% of wasted spend as recoverable, and a fixed ~40hr × £100/hr implementation cost. Change the assumptions and the numbers change.
+
+---
+
 ## Stack
 
 - Next.js 16 (App Router)
@@ -85,6 +94,6 @@ Passes 3 and 4 run in parallel once pass 2 completes.
 
 ## Deployment
 
-Push the `fri/` directory to a GitHub repo, then deploy on Vercel. Add `ANTHROPIC_API_KEY` as an environment variable in the Vercel project settings.
+Push this repository to GitHub, then deploy on Vercel. Add `ANTHROPIC_API_KEY` as an environment variable in the Vercel project settings.
 
 No conversation data is persisted - everything is analysed in-memory and discarded when the session ends.

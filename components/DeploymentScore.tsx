@@ -55,7 +55,7 @@ export default function DeploymentScore({ score, genuineResolutionRate, kbHealth
         </div>
 
         <p className="text-white/40 text-sm mt-3 leading-relaxed">
-          A composite of resolution quality, KB health, and primitive coverage. This is the number an FDE would use to benchmark a deployment at onboarding.
+          A composite of resolution quality, KB health, and primitive coverage, combined with fixed heuristic weights (not calibrated against labelled outcomes). Treat it as a directional signal, not a validated benchmark.
         </p>
 
         {/* Sub-scores */}
